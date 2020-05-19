@@ -1,2 +1,5 @@
 # tec-MORSE
-TEC-1 morse code encoder decoder
+TEC-1 morse code 
+- encoder decoder
+- CW
+- RTTY
