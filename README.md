@@ -75,21 +75,27 @@ explained line by line
 
 ```
 : dash-index-lookup ( char -- )
-    This is the start of the colon definition for the dash-index-lookup word. It takes one character input and leaves the resulting index on the stack.
+    This is the start of the colon definition for the dash-index-lookup word. 
+    It takes one character input and leaves the resulting index on the stack.
 64 dash_jump
     This line sets the initial value of dash_jump to 64 and puts it on the stack.
 64 dash_jump /mod
-    This line calculates the modulus of 64 and dash_jump, which will be 0 if the character input was a '.' and 1 if the input was a '-'. It leaves the result on the stack.
+    This line calculates the modulus of 64 and dash_jump, which will be 0 
+    if the character input was a '.' and 1 if the input was a '-'. It leaves the result on the stack.
 over over =
-    This line compares the two values on the stack. If they are equal, it will execute the code between the 'if' and the 'then'. If they are not equal, it will execute the code between the 'else' and the 'then'.
+    This line compares the two values on the stack. If they are equal, 
+    it will execute the code between the 'if' and the 'then'. 
+    If they are not equal, it will execute the code between the 'else' and the 'then'.
 if
       dash_jump /
       1+
-    This code is executed if the two values on the stack are equal. It divides dash_jump by 2 and adds 1 to the index.
+    This code is executed if the two values on the stack are equal. 
+    It divides dash_jump by 2 and adds 1 to the index.
 else
       drop
       dash_jump /
-    This code is executed if the two values on the stack are not equal. It drops the top value on the stack (the result of the modulus calculation) and divides dash_jump by 2.
+    This code is executed if the two values on the stack are not equal. 
+    It drops the top value on the stack (the result of the modulus calculation) and divides dash_jump by 2.
 then
     This word closes the 'if...then...else' structure.
 ;
