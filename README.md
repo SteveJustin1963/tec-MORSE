@@ -20,7 +20,8 @@ A decoder tree can be used like;
 ![](https://github.com/SteveJustin1963/tec-MORSE/blob/master/pics/mortree1.png)
 
 
-### Logarithms 
+### Algorithms
+
 ```
 dot_avg = dot_avg + new_dot/8 - dot_avg/8
 pulse_ave = dot_avg/4 + dash_avg/2
