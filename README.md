@@ -20,6 +20,19 @@ A decoder tree can be used like;
 ![](https://github.com/SteveJustin1963/tec-MORSE/blob/master/pics/mortree1.png)
 
 
+### Logarithms 
+```
+dot_avg = dot_avg + new_dot/8 - dot_avg/8
+pulse_ave = dot_avg/4 + dash_avg/2
+CW_space_avg = CW_space_avg - CW_space_avg/8 + space_time/8
+symbol_bounday = CW_space_average - (  dash_time -  CW_space_average)/4
+adjust_CW_boundary =  CW_boundary +- X
+```
+
+
+
+
+
 
 ### project
 - build a encoder/ decoder. code for freq and pulse duration detection like tec-DAT instead for morse code and display on led readout. 
