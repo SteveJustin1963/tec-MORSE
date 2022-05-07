@@ -15,10 +15,7 @@
 
 // Length of one dot. Assumes constant WPM at the moment
 #define DOT_LEN 1
-
 #define THRESHOLD 200
-
-
 
 
 
@@ -28,13 +25,18 @@ float goetzelCoeff=0;
 // Length of the goertzel filter
 #define GOERTZEL_N 128
 
-// The samples taken from the A/D. The A/D results are
-// 10-bits.
-int sampledData[GOERTZEL_N];  
+// The samples taken from the A/D. The A/D results are 10-bits.
 // The array sampledData is being declared as an integer.
+int sampledData[GOERTZEL_N];  
 
 
-
+//This is an enum that defines six different statuses that a character can have. 
+// none = 0, This means that the character has no status. 
+// dot = 1, This means that the character is a dot. 
+// dash = 2, This means that the character is a dash. 
+// intersymbol = 3, This means that the character is between two symbols. 
+// interchar = 4, This means that the character is between two characters. 
+// interword = 5, This means that the character is between two words.
 enum statuses
 {
     none =0,
@@ -44,19 +46,8 @@ enum statuses
     interchar,
     interword
 };
-//This is an enum that defines six different statuses that a character can have. 
-none = 0
-This means that the character has no status. 
-dot = 1
-This means that the character is a dot. 
-dash = 2
-This means that the character is a dash. 
-intersymbol = 3
-This means that the character is between two symbols. 
-interchar = 4
-This means that the character is between two characters. 
-interword = 5
-This means that the character is between two words.
+
+
 
 
 
@@ -78,17 +69,12 @@ byte currentDashJump = 64;
 char currentAssumedChar='\0';
 
 
-
-
-
 void setup()
 {
   //This function is called once when the program starts. It opens the serial port and sets the data rate to 115200 bits per second.
     Serial.begin(115200); 
   
-  
-  
-  
+   
   
   // Set ADC prescaler to 16
   //_SFR_BYTE(ADCSRA) is the ADC control and status register A
