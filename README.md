@@ -1,7 +1,19 @@
 # tec-MORSE
 TEC-1 morse code 
 
+### Types
+1. International Morse code
+2. American Morse code
+3. Continental Morse code
+4. railway Morse code
+5. Morse code for visually impaired
+6. Braille Morse code
+7. Morse code for the deaf
+8. Semaphore Morse code
+9. International maritime signal flags
+10. American Morse code
 
+### Method
 Morse code is a code where each letter of the alphabet is represented by a combination of dots and dashes. The code is named after Samuel Morse, who developed it in 1837. There are only a few simple rules to encoding and decoding Morse code:
 
 1. A dot is one unit of time.
