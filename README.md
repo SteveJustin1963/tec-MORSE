@@ -95,7 +95,8 @@ else
       drop
       dash_jump /
     This code is executed if the two values on the stack are not equal. 
-    It drops the top value on the stack (the result of the modulus calculation) and divides dash_jump by 2.
+    It drops the top value on the stack (the result of the modulus calculation) 
+    and divides dash_jump by 2.
 then
     This word closes the 'if...then...else' structure.
 ;
