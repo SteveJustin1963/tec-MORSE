@@ -89,6 +89,19 @@ void decode(char *str)
 }
  
 
+
+// Driver program
+int main()
+{
+    // input string
+    char str[] = "... --- ...";
+ 
+    // call the decode() function
+    decode(str);
+ 
+    return 0;
+}
+
 \\\\\\\\\\\\\\\\\\\
 forth
 
@@ -142,14 +155,3 @@ forth
     result type
 ;
 \\\\\\\\\\\\\\\\\\\\\\\\\\
-// Driver program
-int main()
-{
-    // input string
-    char str[] = "... --- ...";
- 
-    // call the decode() function
-    decode(str);
- 
-    return 0;
-}
