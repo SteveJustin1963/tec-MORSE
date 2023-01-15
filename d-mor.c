@@ -1,4 +1,12 @@
 // morse code decoding 
+Initialize an empty string "result" and an index variable "j" to store the decoded string and the current index in the result string, respectively.
+Iterate over each character in the input string "str".
+If the current character is a space or a forward slash, add a space to the "result" string and increment the index "j".
+If the current character is a dot or a dash, search for the next character to form a code for an alphabet.
+If the next character forms a valid code, add the corresponding alphabet to the "result" string and increment the index "j".
+After iterating over the entire input string, add a null termination character to the "result" string.
+Print the "result" string.
+/////////////////////////
 
 #include <stdio.h>
 #include <string.h>
@@ -80,6 +88,60 @@ void decode(char *str)
     printf("%s\n", result);
 }
  
+
+\\\\\\\\\\\\\\\\\\\
+forth
+
+: decode ( str len -- ) 
+    create result len + 1 allot 
+    0 swap 0 ?do
+        dup i c@
+        dup ' ' = 
+        if
+            ' ' result i + c!
+            1+ 
+        else
+            dup '/' =
+            if
+                ' ' result i + c!
+                1+
+            else
+                dup '-' = 
+                if
+                    i 1+ c@ '.' = 
+                    if
+                        'A' result i + c!
+                        2 +
+                    else
+                        i 1+ c@ '-' = 
+                        if
+                            'B' result i + c!
+                            2 +
+                        then
+                    then
+                else
+                    dup '.' = 
+                    if
+                        i 1+ c@ '-' =
+                        if
+                            'A' result i + c!
+                            2 +
+                        else
+                            i 1+ c@ '.' =
+                            if
+                                'W' result i + c!
+                                2 +
+                            then
+                        then
+                    then
+                then
+            then
+        then
+    loop
+    result len 0 c!
+    result type
+;
+\\\\\\\\\\\\\\\\\\\\\\\\\\
 // Driver program
 int main()
 {
