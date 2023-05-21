@@ -39,7 +39,7 @@ A decoder tree can be used like;
 ![](https://github.com/SteveJustin1963/tec-MORSE/blob/master/pics/mortree1.png)
 
 
-## Algorithms
+## Algorithm 1
 
 ```
 dot_avg = dot_avg + new_dot/8 - dot_avg/8
@@ -118,7 +118,7 @@ int main()
 
 
 
-## another Algorithms
+##  Algorithms2
 ```
 index=0
     dash_jump=64
