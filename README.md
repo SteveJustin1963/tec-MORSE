@@ -48,72 +48,9 @@ CW_space_avg = CW_space_avg - CW_space_avg/8 + space_time/8
 symbol_bounday = CW_space_average - (  dash_time -  CW_space_average)/4
 adjust_CW_boundary =  CW_boundary +- X
 ```
- using this logic we derive ...
+ ## using this logic we derive ...
  ```
- #include <stdio.h>
-
-// Function to decode Morse code based on durations
-void decodeMorseCode(int dot_avg, int dash_avg, int CW_space_avg, int symbol_boundary, int duration)
-{
-    // Your Morse code decoding logic here
-    // This function should analyze the duration and determine the corresponding Morse code symbol
-    // You can use if-else or switch statements to handle different cases
-    // For example, you can print "." for dot, "-" for dash, " " for character boundary, and "/ " for word boundary
-    // Feel free to customize this function based on your specific Morse code decoding requirements
-    // ...
-}
-
-// Function to process audio input and convert it into durations
-int processAudioInput()
-{
-    // Your audio processing logic here
-    // This function should read the audio input, analyze the sound patterns,
-    // and convert them into durations that can be used by the decoding logic
-    // You may need to use audio processing libraries or algorithms to capture and analyze the sound patterns
-
-    // Sample implementation to read durations from a file (replace with your actual audio processing code)
-    FILE* audioFile = fopen("audio_input.txt", "r");
-    int duration = 0;
-
-    if (audioFile != NULL)
-    {
-        fscanf(audioFile, "%d", &duration);
-        fclose(audioFile);
-    }
-
-    return duration;
-}
-
-int main()
-{
-    // Initialize the variables used in the calculations
-    int dot_avg = 10;
-    int dash_avg = 30;
-    int CW_space_avg = 50;
-    int symbol_boundary = CW_space_avg - (dash_avg - CW_space_avg) / 4;
-    int CW_boundary = 0;
-    int X = 0;
-
-    // Loop to continuously process audio input and decode Morse code
-    while (1)
-    {
-        // Process audio input and convert it into durations
-        int measured_duration = processAudioInput();
-
-        // Update the variables based on new measurements
-        dot_avg = dot_avg + measured_duration / 8 - dot_avg / 8;
-        dash_avg = dash_avg + measured_duration / 8 - dash_avg / 8;
-        CW_space_avg = CW_space_avg - CW_space_avg / 8 + measured_duration / 8;
-        symbol_boundary = CW_space_avg - (dash_avg - CW_space_avg) / 4;
-        int adjusted_CW_boundary = CW_boundary + X;
-
-        // Decode Morse code using measured durations
-        decodeMorseCode(dot_avg, dash_avg, CW_space_avg, symbol_boundary, measured_duration);
-    }
-
-    return 0;
-}
-
+cw-1
 ```
 
 
