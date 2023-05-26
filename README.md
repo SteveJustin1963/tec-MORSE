@@ -69,5 +69,6 @@ index=0
 - http://alanpich.github.io/Morse-Code-Recognition/Introduction.html
 - https://www.pa3fwm.nl/software/rscw/algorithm.html
 - https://github.com/nicolacimmino/MorseDecoder
+- https://hackaday.com/2014/01/17/magic-morse-arduino-trainer/
 - 
 - 
