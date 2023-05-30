@@ -128,14 +128,14 @@ Overall, this algorithm allows for fast and accurate decoding of Morse code symb
    - You can simply print the decoded text to the console or display it in a user interface.
    - If you're building a more complex application, you might transmit the decoded text over a network, save it to a file, or perform further analysis on the Morse code data.
 
-need to experiment, iterate, and fine-tune algorithms and settings to achieve the best results based on your specific audio signals and requirements.
 
  
 
 
 ## Iterate
-- https://github.com/SteveJustin1963/tec-HELL
-- https://github.com/SteveJustin1963/tec-RTTY
+- need to experiment, iterate, and fine-tune algorithms and settings to achieve the best results based on your specific audio signals and requirements.
+
+
 
 ## Ref
 - http://alanpich.github.io/Morse-Code-Recognition/Introduction.html
@@ -143,5 +143,6 @@ need to experiment, iterate, and fine-tune algorithms and settings to achieve th
 - https://github.com/nicolacimmino/MorseDecoder
 - https://hackaday.com/2014/01/17/magic-morse-arduino-trainer/
 - https://github.com/jwrr/z80usb
-- 
+- https://github.com/SteveJustin1963/tec-HELL
+- https://github.com/SteveJustin1963/tec-RTTY
 - 
