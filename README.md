@@ -66,6 +66,30 @@ index=0
     endfor
     ascii = lookupstring[index]
 ```
+
+explanation- benefits:
+
+1. Initialization:
+   - `index = 0` initializes the index variable used to keep track of the current position in the lookup string.
+   - `dash_jump = 64` sets the initial value of dash_jump, which is used to determine the jump distance within the binary search algorithm.
+
+2. Binary search iteration:
+   - For each received element `e`, the algorithm performs the following steps:
+     - `dash_jump = dash_jump/2` reduces the jump distance by half in each iteration.
+     - `(e == '.') ? 1 : dash_jump` checks if the received element is a dot or a dash. If it's a dot, the index is incremented by 1; otherwise, it is incremented by the current value of dash_jump.
+   - The binary search algorithm allows for efficient searching and decoding of Morse code symbols by repeatedly dividing the search space in half.
+
+3. Lookup and output:
+   - `ascii = lookupstring[index]` retrieves the ASCII character corresponding to the final index position after the binary search.
+   - The lookup string likely contains a mapping between Morse code symbols and their corresponding ASCII characters.
+
+Benefits of using this algorithm:
+- Efficiency: The binary search algorithm provides efficient searching by reducing the search space in half in each iteration. This can significantly speed up the decoding process, especially if you have a large number of Morse code symbols to decode.
+- Accuracy: By using a binary search approach, the algorithm can precisely locate the corresponding ASCII character in the lookup table based on the received Morse code symbols.
+- Flexibility: This algorithm can be easily adapted to different Morse code lookup tables or mappings by adjusting the lookupstring and the symbols it contains.
+
+Overall, this algorithm allows for fast and accurate decoding of Morse code symbols into ASCII characters, making it suitable for real-time applications or scenarios where efficiency is crucial.
+
 =================
 
 
