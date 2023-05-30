@@ -70,5 +70,6 @@ index=0
 - https://www.pa3fwm.nl/software/rscw/algorithm.html
 - https://github.com/nicolacimmino/MorseDecoder
 - https://hackaday.com/2014/01/17/magic-morse-arduino-trainer/
+- https://github.com/jwrr/z80usb
 - 
 - 
