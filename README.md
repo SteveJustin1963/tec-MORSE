@@ -1,5 +1,5 @@
 # tec-MORSE
-TEC-1 morse code send and rx and decode
+TEC-1 morse code send and receive and decode
 
 
 
