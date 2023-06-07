@@ -148,7 +148,42 @@ Key Components:
 
 By achieving these technical goals, the Morse Code communication system will enable reliable and efficient transmission and reception of messages, facilitating effective communication in a variety of scenarios. 
  
- 
+## nn approach
+```nn1.f```
+
+ how the code works:
+
+1. Neural Network Weights:
+   - The line `variable weights` declares a Forth variable named `weights`.
+   - The line `8 cells allot weights !` allocates 8 cells of memory for the `weights` variable.
+   - The `init-weights` function initializes the `weights` variable by storing values in each cell using the loop construct. The loop iterates 8 times, using the index `i` to calculate the address of each cell and storing the corresponding value using `i !`.
+
+2. Morse Code Lookup Table:
+   - The line `variable morse-lookup` declares a Forth variable named `morse-lookup`.
+   - The line `78 cells allot morse-lookup !` allocates 78 cells of memory for the `morse-lookup` variable.
+   - The `init-morse-lookup` function initializes the `morse-lookup` variable by storing the ASCII values for each letter of the alphabet and their corresponding Morse code patterns. The loop iterates 26 times, using the index `i` to calculate the addresses of the cells in the `morse-lookup` table and storing the ASCII values using `i +` and `!`.
+
+3. Decoding Morse Code:
+   - The `decode-morse-code` function takes an address as input, representing a Morse code pattern, and decodes it using the neural network weights.
+   - The function starts by looping through the neural network weights using the `8 0 do` construct, with the index `i` representing the current weight.
+   - Within the nested loop, the function retrieves the current weight and compares it with the input pattern using `swap over xor 0=`. If they match, the corresponding ASCII value is emitted using `emit` and the function exits.
+   - If no match is found, the loop continues to the next weight until all weights have been checked.
+
+4. Converting an 8-bit Integer to Morse Code:
+   - The `int-to-morse-code` function takes an 8-bit integer as input and converts it into a Morse code pattern.
+   - The function starts by looping 8 times using the `8 0 do` construct, with the index `i` representing the current bit position.
+   - Within the loop, the function checks the least significant bit of the integer using `1 and`. If it's set (1), the function emits a dash (`'-'`) using `emit`; otherwise, it emits a dot (`'.'`).
+   - After emitting the appropriate character, the function divides the integer by 2 (`2/`) to shift the bits to the right.
+   - Once all 8 bits have been processed, the function drops the remaining integer from the stack.
+
+5. Example Usage:
+   - The `test-decode` function provides an example usage scenario.
+   - It prompts the user to enter an 8-bit integer using `"Enter an 8-bit integer: "`, and then reads the input using `decimal 2>r u.r cr r>` (Note: The use of `u.r` might cause problems depending on the Forth system).
+   - The integer is then converted to Morse code using `int-to-morse-code` and decoded using `decode-morse-code`.
+   - The resulting character(s) are printed to the console using `emit`.
+   - Finally, the `cr` command is used to print a newline character.
+
+Note: The code assumes the use of ASCII encoding and handles upper case letters A to Z. Adjustments may be necessary for handling additional characters or different encoding schemes.
 
 
 ## Iterate
