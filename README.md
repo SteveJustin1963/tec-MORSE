@@ -5,33 +5,10 @@ TEC-1 morse code send and rx and decode
 
 
 
-### project
 
-Technical Goal: Development of a Morse Code Transmitter and Receiver System with Error Tolerance and Keypad Input
 
-Objective: To design and implement a comprehensive Morse Code communication system capable of encoding and decoding messages while being tolerant against frequency drift, duration shift, and errors. The system should provide a user-friendly interface for inputting Morse Code messages via a keypad and outputting them through a TTL switch to operate a Pixie QRP-CW-2Watt transmitter connected to a magloop antenna. The system will also include an LED readout to display the transmitted and received Morse Code messages.
-
-Key Components:
-
-1. Pulse Duration Creation and Detection: Develop a circuit or software algorithm that can generate and detect precise pulse durations corresponding to the dots and dashes of Morse Code.
-
-2. Morse Encoder: Implement a module that converts alphanumeric characters into their corresponding Morse Code representations. This encoder should take user input from a keypad and produce the Morse Code output.
-
-3. Morse Decoder: Create a module capable of accurately decoding Morse Code signals received by the system, converting them back into alphanumeric characters for display.
-
-4. Error Tolerance: Design the system to handle frequency drift and duration shift by incorporating adaptive algorithms that can adjust pulse timings dynamically. Error detection and correction techniques should be employed to minimize data corruption during transmission and reception.
-
-5. User Interface: Develop a user-friendly interface that allows users to input Morse Code messages through a keypad. This interface should provide real-time feedback on the input and allow for easy editing and transmission of the messages.
-
-6. TTL Switch Integration: Integrate the system with a TTL switch to enable the operation of a Pixie QRP-CW-2Watt transmitter. The TTL switch should be capable of activating the transmitter when the Morse Code message is ready for transmission.
-
-7. LED Readout: Implement an LED readout that can display the transmitted and received Morse Code messages in real-time. The LED display should be designed to clearly indicate the dots, dashes, and spaces.
-
-By achieving these technical goals, the Morse Code communication system will enable reliable and efficient transmission and reception of messages, facilitating effective communication in a variety of scenarios. 
- 
-
-## Method
-Morse code is a code where each letter of the alphabet is represented by a combination of dots and dashes. The code is named after Samuel Morse, who developed it in 1837. There are only a few simple rules to encoding and decoding Morse code:
+## Morse code 
+is a code where each letter of the alphabet is represented by a combination of dots and dashes. The code is named after Samuel Morse, who developed it in 1837. There are only a few simple rules to encoding and decoding Morse code:
 
 1. A dot is one unit of time.
 2. A dash is three units of time.
@@ -109,7 +86,7 @@ Benefits of using this algorithm:
 
 Overall, this algorithm allows for fast and accurate decoding of Morse code symbols into ASCII characters, making it suitable for real-time applications or scenarios where efficiency is crucial.
 
-=================
+ 
 
 
 ## getting the signal ready
@@ -147,7 +124,30 @@ Overall, this algorithm allows for fast and accurate decoding of Morse code symb
    - You can simply print the decoded text to the console or display it in a user interface.
    - If you're building a more complex application, you might transmit the decoded text over a network, save it to a file, or perform further analysis on the Morse code data.
 
+### softw
 
+Technical Goal: Development of a Morse Code Transmitter and Receiver System with Error Tolerance and Keypad Input
+
+Objective: To design and implement a comprehensive Morse Code communication system capable of encoding and decoding messages while being tolerant against frequency drift, duration shift, and errors. The system should provide a user-friendly interface for inputting Morse Code messages via a keypad and outputting them through a TTL switch to operate a Pixie QRP-CW-2Watt transmitter connected to a magloop antenna. The system will also include an LED readout to display the transmitted and received Morse Code messages.
+
+Key Components:
+
+1. Pulse Duration Creation and Detection: Develop a circuit or software algorithm that can generate and detect precise pulse durations corresponding to the dots and dashes of Morse Code.
+
+2. Morse Encoder: Implement a module that converts alphanumeric characters into their corresponding Morse Code representations. This encoder should take user input from a keypad and produce the Morse Code output.
+
+3. Morse Decoder: Create a module capable of accurately decoding Morse Code signals received by the system, converting them back into alphanumeric characters for display.
+
+4. Error Tolerance: Design the system to handle frequency drift and duration shift by incorporating adaptive algorithms that can adjust pulse timings dynamically. Error detection and correction techniques should be employed to minimize data corruption during transmission and reception.
+
+5. User Interface: Develop a user-friendly interface that allows users to input Morse Code messages through a keypad. This interface should provide real-time feedback on the input and allow for easy editing and transmission of the messages.
+
+6. TTL Switch Integration: Integrate the system with a TTL switch to enable the operation of a Pixie QRP-CW-2Watt transmitter. The TTL switch should be capable of activating the transmitter when the Morse Code message is ready for transmission.
+
+7. LED Readout: Implement an LED readout that can display the transmitted and received Morse Code messages in real-time. The LED display should be designed to clearly indicate the dots, dashes, and spaces.
+
+By achieving these technical goals, the Morse Code communication system will enable reliable and efficient transmission and reception of messages, facilitating effective communication in a variety of scenarios. 
+ 
  
 
 
