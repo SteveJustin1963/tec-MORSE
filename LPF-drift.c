@@ -7,7 +7,7 @@ assuming that you want to do integer division by the number of taps, which will 
 code  depend on additional factors such as the memory layout of your system, 
 the type and size of the data  working with,
 how we initialized your registers, 
-and specific requirements for the low-pass filter.   
+and specific requirements for the low-pass filter.   \
     
     LowPassFilterWithDrift:
     LD B, 4       ; Number of filter taps
