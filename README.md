@@ -805,4 +805,5 @@ Note: The code assumes the use of ASCII encoding and handles upper case letters 
 - https://github.com/SteveJustin1963/tec-HELL
 - https://github.com/SteveJustin1963/tec-RTTY
 - http://mikenaberezny.com/hardware/c64-128/microlog-air-1/
+- https://morsecode.world/international/decoder/audio-decoder-adaptive.html
 - 
