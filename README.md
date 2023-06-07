@@ -26,6 +26,8 @@ A decoder tree can be used like;
 
 
 ## Algorithm 1
+```cw1.f```
+
 
 ```
 dot_avg = dot_avg + new_dot/8 - dot_avg/8
@@ -48,7 +50,7 @@ this algorithm relates to timing calculations. Let's go through each of them:
 
  note that the implementation and usage of these algorithms may vary depending on the specific context of your Morse code decoding project. Additionally, the effectiveness and accuracy of these algorithms may depend on the quality and consistency of the Morse code signals being processed.
 
-using this logic we derive ... `cw-1`
+
 
 
 
