@@ -88,7 +88,40 @@ Benefits of using this algorithm:
 
 Overall, this algorithm allows for fast and accurate decoding of Morse code symbols into ASCII characters, making it suitable for real-time applications or scenarios where efficiency is crucial.
 
- 
+ ```
+ variable index
+variable dash_jump
+: lookup ( -- char ) "abcdefghijklmnopqrstuvwxyz0123456789" index @ + c@ ;
+
+: reset ( -- ) 0 index ! 64 dash_jump ! ;
+: process ( c -- ) 
+    dash_jump @ 2 / dash_jump !
+    over [char] . = if drop 1 else dash_jump @ then
+    index @ + index !
+;
+: decode ( -- ascii ) lookup ;
+
+: main
+    reset
+    begin key process key? until
+    decode emit
+;
+```
+Let's break down how this program works.
+
+First, we declare two global variables, index and dash_jump, which will hold the current index in the lookup string and the current dash_jump value, respectively.
+
+The lookup word retrieves the ASCII character at the current index from the lookup string, which contains a mapping of Morse code symbols to ASCII characters.
+
+The reset word initializes index to 0 and dash_jump to 64, just like in your pseudocode.
+
+The process word takes a character from the input, checks if it's a dot (.), and updates index accordingly. If the input character is a dot, index is incremented by 1; otherwise, it's incremented by the current value of dash_jump. After each input character, dash_jump is divided by 2.
+
+The decode word retrieves the ASCII character corresponding to the current index from the lookup string.
+
+Finally, main is the entry point for the program. It initializes the variables with reset, reads input characters with process until there's no more input, and then uses decode to retrieve and print the corresponding ASCII character.
+
+Please note that Forth is a stack-based language, and it uses Reverse Polish Notation (RPN), so operations are often done in a different order than you might expect if you're used to other languages. Also, Forth doesn't have built-in control structures like if or for in the way you might be used to. Instead, it uses words (functions) to manipulate the stack and control program flow.
 
 
 ## getting the signal ready
