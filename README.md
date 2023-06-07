@@ -199,9 +199,116 @@ Please note that Forth is a stack-based language, and it uses Reverse Polish Not
    - You can simply print the decoded text to the console or display it in a user interface.
    - If you're building a more complex application, you might transmit the decoded text over a network, save it to a file, or perform further analysis on the Morse code data.
 
-### softw
 
-Technical Goal: Development of a Morse Code Transmitter and Receiver System with Error Tolerance and Keypad Input
+```
+VARIABLE frames
+VARIABLE patterns
+VARIABLE current-pattern
+VARIABLE decoded-message
+
+: preprocess ( y fs -- )
+  frame-duration frame-length /
+  CREATE frames-addr frame-length ALLOT
+  frame-length 0 DO
+    i frames-addr +  i frames +!
+  LOOP
+;
+
+: pre-emphasis ( -- )
+  frame-length 0 DO
+    i frames-addr +  i @ i 1- @ alpha *
+    frames i @ f-  frames i !
+  LOOP
+;
+
+: noise-reduction ( -- )
+  frame-length 0 DO
+    frames i @ DUP  ABS F**  frame-length 1- + F/  frames i @ F/  1.0 noise-reduction-param F-  F*  frames i @  frames i + F*  F+  frames i !
+  LOOP
+;
+
+: bandpass-filter ( -- )
+  frame-length 0 DO
+    frames i @ DUP  2DUP bandpass-freq-range 2! fs 2/ F/
+    frames i @ frames-addr +  filter  frames i !
+  LOOP
+;
+
+: normalize ( -- )
+  FMIN  frame-length 0 DO
+    frames i @ F/  frames i !
+  LOOP
+;
+
+: threshold ( -- )
+  frame-length 0 DO
+    frames i @ threshold F< IF  0 ELSE  1 THEN  frames i !
+  LOOP
+;
+
+: duration-analysis ( -- )
+  frame-length 0 DO
+    frames i @ patterns i +!  patterns i @ +
+  LOOP
+;
+
+: pattern-recognition ( -- )
+  frame-length 1 DO
+    patterns i @ 1 = IF
+      patterns i @ current-pattern C@ ASCII - IF
+        patterns i @ 0 > IF
+          current-pattern C!
+          current-pattern EMIT
+        THEN
+      ELSE
+        current-pattern C!
+      THEN
+      patterns i !
+    ELSE
+      patterns i @ 0 = IF
+        current-pattern C!
+        current-pattern EMIT
+      THEN
+      patterns i !
+    THEN
+  LOOP
+;
+
+: decode ( -- )
+  decoded-message 0 DO
+    decoded-message I @ C@ 8 + EMIT
+  LOOP
+;
+
+: morse-code-signal ( -- )
+  preprocess
+  pre-emphasis
+  noise-reduction
+  bandpass-filter
+  normalize
+  threshold
+  duration-analysis
+  pattern-recognition
+  decode
+;
+
+morse-code-signal
+```
+
+Forth code refactors some of the previous errors and adds improvements:
+
+The CREATE command is used to allocate memory for the frames array.
+The frames-addr variable is introduced to hold the base address of the frames array.
+The frame-length loop control variable is used consistently throughout the code.
+The FMIN command is used in the normalize word to find the minimum value in the frames array.
+The final line morse-code-signal executes the morse-code-signal word, which triggers the preprocessing and decoding steps.
+Please ensure that you have the necessary variables (frame-duration, bandpass-freq-range, threshold, alpha, etc.) properly defined and replace them with their respective values.
+
+After loading the code into your Forth system, executing morse-code-signal will preprocess and decode the Morse code signal.
+
+
+
+## Technical Goal: Development of a Morse Code Transmitter and Receiver System with Error Tolerance and Keypad Input
 
 Objective: To design and implement a comprehensive Morse Code communication system capable of encoding and decoding messages while being tolerant against frequency drift, duration shift, and errors. The system should provide a user-friendly interface for inputting Morse Code messages via a keypad and outputting them through a TTL switch to operate a Pixie QRP-CW-2Watt transmitter connected to a magloop antenna. The system will also include an LED readout to display the transmitted and received Morse Code messages.
 
