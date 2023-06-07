@@ -1,44 +1,62 @@
-; Low-Pass Filtering with Drift
-
-; Assume A points to the input sample, DE holds the previous filtered sample
-; Assume HL holds the initial cutoff frequency
-; Assume BC holds the drift value
-
-LowPassFilterWithDrift:
+\ simple low-pass filter with frequency drift. However, there are some issues and areas of confusion in your code. 
+assuming A is a pointer to the input sample array, 
+DE holds the address of the previous filtered sample, 
+HL holds the initial cutoff frequency, 
+and BC holds the drift value.
+assuming that you want to do integer division by the number of taps, which will lead to rounding towards zero.
+code  depend on additional factors such as the memory layout of your system, 
+the type and size of the data  working with,
+how we initialized your registers, 
+and specific requirements for the low-pass filter.   
+    
+    LowPassFilterWithDrift:
     LD B, 4       ; Number of filter taps
     LD C, B       ; Counter for the number of filter taps
 
 FilterLoop:
     LD A, (DE)    ; Load the previous filtered sample
-    SUB H         ; Compare it with the current cutoff frequency
+    SUB (HL)      ; Compare it with the current cutoff frequency
     JR NC, Skip   ; If above cutoff frequency, skip filtering
 
     ADD A, (DE)   ; Accumulate the current and previous samples
     INC DE
-    DJNZ FilterLoop
+    DEC C
+    JR NZ, FilterLoop
 
-    LD A, B       ; Divide the accumulated sum by the number of taps
+    PUSH HL       ; Preserve HL
+    LD H, B       ; Copy the number of taps to HL
     CALL DivideByB
+    POP HL        ; Restore HL
 
-    LD (DE-1), A  ; Store the filtered sample back into memory (decrement DE to point to the previous sample)
+    DEC DE
+    LD (DE), A    ; Store the filtered sample back into memory (decrement DE to point to the previous sample)
 
-    ADD H, C      ; Update the cutoff frequency with the drift value
-
+    LD A, H       ; Load the current cutoff frequency
+    ADD A, C      ; Update the cutoff frequency with the drift value
+    LD H, A       ; Store back the updated cutoff frequency
     RET
 
 DivideByB:
-    XOR H         ; Clear H register for quotient
-    LD B, A       ; Copy dividend (accumulator) to B register
-    XOR A         ; Clear A register for remainder
+    PUSH BC       ; Preserve BC
+    PUSH DE       ; Preserve DE
+
+    XOR A         ; Clear A register for quotient
+    LD D, A       ; Clear D register for remainder
+    LD E, B       ; Copy the number of taps to E register
 
 DivideLoop:
-    CP B          ; Compare remainder with dividend
-    JR C, DivideEnd ; If remainder < dividend, division complete
+    INC A         ; Increment A (quotient)
+    CP E          ; Compare A with E (number of taps)
+    JR NZ, DivideLoop
 
-    SUB B         ; Subtract dividend from remainder
-    INC H         ; Increment quotient
+    POP DE        ; Restore DE
+    POP BC        ; Restore BC
 
-    JR DivideLoop ; Repeat division
+    RET
 
-DivideEnd:
+Skip:
+    INC DE        ; Skip filtering, but still move to the next sample
+    DEC C
+    JR NZ, FilterLoop
+
     RET
