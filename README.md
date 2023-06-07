@@ -294,8 +294,373 @@ VARIABLE decoded-message
 
 morse-code-signal
 ```
+Let's explain how the whole program works step by step:
 
-Forth code refactors some of the previous errors and adds improvements:
+
+## 1. `preprocess`: 
+This word reads the audio signal and prepares it for further processing. It divides the signal into frames, applies pre-emphasis filtering to enhance higher frequencies, and stores the processed frames in the `frames` buffer.
+
+Let's explain the `preprocess` word in the program:
+
+```
+: preprocess ( y fs -- )
+  frame-duration frame-length /
+  CREATE frames-addr frame-length ALLOT
+  frame-length 0 DO
+    i frames-addr +  i frames +!
+  LOOP
+;
+```
+
+- `: preprocess ( y fs -- )` declares the `preprocess` word in Forth, indicating that it expects two inputs on the stack: the audio signal `y` and the sampling frequency `fs`. It leaves no outputs on the stack.
+
+- `frame-duration frame-length /` calculates the duration of each frame by dividing the total duration of the audio signal (`frame-duration`) by the number of frames (`frame-length`).
+
+- `CREATE frames-addr frame-length ALLOT` creates a buffer named `frames` of size `frame-length`. The buffer is stored at the address `frames-addr`.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `i frames-addr +` calculates the address of the current frame in the `frames` buffer by adding the loop index `i` to the base address of the `frames` buffer (`frames-addr`).
+
+- `i frames +!` fetches the audio signal value at index `i` and stores it in the current frame address.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `preprocess` word takes the audio signal `y` and the sampling frequency `fs` as inputs. It calculates the duration of each frame, creates a buffer called `frames` of size `frame-length`, and stores the audio signal values in the `frames` buffer. This prepares the audio signal for further processing steps, such as pre-emphasis, noise reduction, and pattern recognition.
+
+
+## 2. `pre-emphasis`: 
+This word applies a pre-emphasis filter to each frame. The filter boosts higher frequencies and compensates for attenuation, enhancing the quality of the Morse code signals.
+
+Let's explain the `pre-emphasis` word in the program:
+
+```
+: pre-emphasis ( -- )
+  frame-length 0 DO
+    i frames-addr +  i @ i 1- @ alpha *
+    frames i @ f-  frames i !
+  LOOP
+;
+```
+
+- `: pre-emphasis ( -- )` declares the `pre-emphasis` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `i frames-addr +` calculates the address of the current frame in the `frames` buffer by adding the loop index `i` to the base address of the `frames` buffer (`frames-addr`).
+
+- `i @ i 1- @ alpha *` fetches the audio signal value at index `i` and the previous audio signal value at index `i - 1`. It multiplies the previous value by the `alpha` coefficient, representing the pre-emphasis filter. The aim of the pre-emphasis filter is to emphasize higher frequencies in the audio signal, compensating for the attenuation of higher frequencies during recording or transmission.
+
+- `frames i @ f-` subtracts the pre-emphasized value from the current audio signal value, effectively applying the pre-emphasis filter.
+
+- `frames i !` stores the pre-emphasized value back into the `frames` buffer at the current frame address.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `pre-emphasis` word applies a pre-emphasis filter to each frame of the audio signal stored in the `frames` buffer. It enhances higher frequencies by subtracting the previous audio signal value, scaled by the `alpha` coefficient, from the current audio signal value. The pre-emphasis filter helps to improve the quality of the Morse code signals and compensate for any loss of high-frequency components.
+
+
+
+## 3. `noise-reduction`: 
+
+This word applies a noise reduction algorithm to each frame. It calculates the noise power based on the signal power and reduces the noise component, improving the signal-to-noise ratio.
+
+Let's explain the `noise-reduction` word in the program:
+
+```
+: noise-reduction ( -- )
+  frame-length 0 DO
+    frames i @ DUP
+    ABS F**  frame-length 1- + F/  frames i @ F/  1.0 noise-reduction-param F-  F*  frames i @  frames i + F*  F+  frames i !
+  LOOP
+;
+```
+
+- `: noise-reduction ( -- )` declares the `noise-reduction` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `frames i @ DUP` duplicates the audio signal value at index `i`, leaving a copy on the stack for later calculations.
+
+- `ABS F**` calculates the square of the absolute value of the audio signal value.
+
+- `frame-length 1- + F/` divides the result by `frame-length - 1`, obtaining the average power of the audio signal.
+
+- `frames i @ F/` divides the audio signal value by the average power, obtaining the normalized signal power.
+
+- `1.0 noise-reduction-param F-` subtracts the `noise-reduction-param` value from `1.0`. The `noise-reduction-param` represents the parameter for the noise reduction algorithm.
+
+- `F*` multiplies the normalized signal power by the adjusted `noise-reduction-param`, representing the noise power.
+
+- `frames i @ frames i + F*` multiplies the noise power by the audio signal value.
+
+- `F+` adds the noise power to the original audio signal value, effectively reducing the noise component.
+
+- `frames i !` stores the noise-reduced value back into the `frames` buffer at the current frame address.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `noise-reduction` word applies a noise reduction algorithm to each frame of the audio signal stored in the `frames` buffer. It calculates the average power of the signal, determines the noise power based on the `noise-reduction-param`, and subtracts the noise power from the audio signal value to reduce the noise component. This step helps improve the signal-to-noise ratio and enhances the clarity of the Morse code signals.
+
+
+
+## 4. `bandpass-filter`: 
+
+This word applies a bandpass filter to each frame. It filters out frequencies outside the desired range, isolating the Morse code signals within the specified frequency range.
+
+Let's explain the `bandpass-filter` word in the program:
+
+```
+: bandpass-filter ( -- )
+  frame-length 0 DO
+    frames i @ DUP 2DUP bandpass-freq-range 2! fs 2/ F/
+    frames i @ frames-addr + filter  frames i !
+  LOOP
+;
+```
+
+- `: bandpass-filter ( -- )` declares the `bandpass-filter` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `frames i @ DUP` duplicates the audio signal value at index `i`, leaving a copy on the stack for later calculations.
+
+- `2DUP` duplicates the frequency range values for the bandpass filter, leaving two copies on the stack.
+
+- `bandpass-freq-range 2!` stores the frequency range values in a buffer called `bandpass-freq-range`. It represents the desired frequency range for the bandpass filter.
+
+- `fs 2/ F/` divides the sampling frequency `fs` by `2` and converts it to a floating-point value, representing the normalized cutoff frequency.
+
+- `frames i @ frames-addr + filter` applies the bandpass filter to the audio signal value. It filters out frequencies outside the desired range specified by `bandpass-freq-range`.
+
+- `frames i !` stores the filtered value back into the `frames` buffer at the current frame address.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `bandpass-filter` word applies a bandpass filter to each frame of the audio signal stored in the `frames` buffer. It filters out frequencies outside the desired range specified by `bandpass-freq-range`, isolating the Morse code signals within that frequency range. This step helps remove unwanted frequencies and enhances the clarity of the Morse code signals by focusing on the desired frequency components.
+
+
+## 5. `normalize`: 
+This word normalizes the amplitude of the processed signal. It scales the signal so that its maximum amplitude reaches a predefined value, enhancing the consistency and clarity of the Morse code signals.
+
+Let's explain the `normalize` word in the program:
+
+```
+: normalize ( -- )
+  FMIN frame-length 0 DO
+    frames i @ F/  frames i !
+  LOOP
+;
+```
+
+- `: normalize ( -- )` declares the `normalize` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `FMIN` finds the minimum value from the `frames` buffer. It determines the smallest value among all the audio signal values in the buffer.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `frames i @ F/` divides the audio signal value at index `i` by the minimum value (`FMIN`). This step scales the audio signal values relative to the minimum value, normalizing the amplitude.
+
+- `frames i !` stores the normalized value back into the `frames` buffer at the current frame address.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `normalize` word normalizes the amplitude of the audio signal stored in the `frames` buffer. It scales the audio signal values relative to the minimum value found in the buffer. This step ensures that the maximum amplitude reaches a predefined value, enhancing the consistency and clarity of the Morse code signals. By normalizing the signal, variations in signal amplitude can be adjusted to a desired range, improving the overall quality and reliability of the Morse code decoding process.
+
+## 6. `threshold`: 
+
+This word converts the normalized signal into a binary representation. It applies a threshold to the signal, categorizing each sample as either ON (1) or OFF (0), indicating the presence or absence of a Morse code signal.
+
+Let's explain the `threshold` word in the program:
+
+```
+: threshold ( -- )
+  frame-length 0 DO
+    frames i @ threshold F< IF  0 ELSE  1 THEN  frames i !
+  LOOP
+;
+```
+
+- `: threshold ( -- )` declares the `threshold` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `frames i @ threshold F<` compares the audio signal value at index `i` with the threshold value. If the audio signal value is less than the threshold, it evaluates to true (`-1`), otherwise, it evaluates to false (`0`).
+
+- `IF  0 ELSE  1 THEN` is a conditional statement. If the comparison result is true (`-1`), it sets the audio signal value to `0`, indicating an OFF state (absence of Morse code signal). If the comparison result is false (`0`), it sets the audio signal value to `1`, indicating an ON state (presence of Morse code signal).
+
+- `frames i !` stores the modified value back into the `frames` buffer at the current frame address.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `threshold` word converts the normalized audio signal stored in the `frames` buffer into a binary representation. It applies a threshold to each audio signal value, categorizing it as either `0` (OFF) or `1` (ON), based on whether it is below or above the threshold. This binary representation simplifies the Morse code signal detection process, allowing for easier analysis of the presence or absence of Morse code signals in each frame.
+
+## 7. `duration-analysis`: 
+
+This word analyzes the durations of ON and OFF periods in the binary signal. It calculates the durations and stores them in the `patterns` buffer.
+
+Let's explain the `duration-analysis` word in the program:
+
+```
+: duration-analysis ( -- )
+  frame-length 0 DO
+    frames i @ patterns i +!  patterns i @ +
+  LOOP
+;
+```
+
+- `: duration-analysis ( -- )` declares the `duration-analysis` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `frame-length 0 DO` starts a loop that iterates `frame-length` times, with the loop index `i` ranging from `0` to `frame-length - 1`.
+
+- `frames i @` fetches the binary signal value at index `i` from the `frames` buffer.
+
+- `patterns i +!` increments the value stored in the `patterns` buffer at index `i` by the fetched binary signal value. This step accumulates the durations of ON and OFF periods in the Morse code signal.
+
+- `patterns i @ +` adds the current value stored in the `patterns` buffer at index `i` to the value of the previous iteration. This step keeps a running sum of the durations.
+
+- `LOOP` marks the end of the loop. The loop repeats `frame-length` times, with `i` incremented by `1` on each iteration.
+
+In summary, the `duration-analysis` word analyzes the durations of ON and OFF periods in the binary signal stored in the `frames` buffer. It accumulates the durations by incrementing the corresponding value in the `patterns` buffer. After this word executes, the `patterns` buffer contains the accumulated durations, which will be used in the subsequent `pattern-recognition` step to identify dots, dashes, and gaps in the Morse code signal.
+
+
+
+## 8. `pattern-recognition`: 
+This word recognizes the patterns in the binary signal based on the durations. It identifies dots, dashes, and gaps by comparing the durations with predefined thresholds. It accumulates the dots and dashes in the `current-pattern` buffer and emits the corresponding Morse code characters when a gap is encountered.
+
+Let's explain the `pattern-recognition` word in the program:
+
+```
+: pattern-recognition ( -- )
+  frame-length 1 DO
+    patterns i @ 1 = IF
+      patterns i @ current-pattern C@ ASCII - IF
+        patterns i @ 0 > IF
+          current-pattern C!
+          current-pattern EMIT
+        THEN
+      ELSE
+        current-pattern C!
+      THEN
+      patterns i !
+    ELSE
+      patterns i @ 0 = IF
+        current-pattern C!
+        current-pattern EMIT
+      THEN
+      patterns i !
+    THEN
+  LOOP
+;
+```
+
+- `: pattern-recognition ( -- )` declares the `pattern-recognition` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `frame-length 1 DO` starts a loop that iterates `frame-length - 1` times, with the loop index `i` ranging from `0` to `frame-length - 2`.
+
+- `patterns i @ 1 = IF` checks if the value stored in the `patterns` buffer at index `i` is equal to `1`. This condition identifies the ON state (presence of Morse code signal) in the binary signal.
+
+- If the condition is true, `patterns i @ current-pattern C@ ASCII - IF` checks if the character represented by the `current-pattern` buffer minus its ASCII value (`45`) is not equal to `0`. This condition verifies if the current pattern is not a dash.
+
+- If the condition is true, `patterns i @ 0 > IF` checks if the pattern value is greater than `0`, indicating a dot in the Morse code signal.
+
+- If the pattern is a dot, `current-pattern C!` stores the dot in the `current-pattern` buffer, effectively building the Morse code representation.
+
+- If the pattern is not a dot or a dash, it must be a gap in the Morse code signal.
+
+- `current-pattern EMIT` outputs the accumulated Morse code pattern stored in the `current-pattern` buffer.
+
+- `patterns i !` stores the current pattern index back into the `patterns` buffer, preparing it for the next iteration.
+
+- The rest of the code continues with the looping process until it reaches the end of the loop with `LOOP`.
+
+In summary, the `pattern-recognition` word processes the binary signal stored in the `patterns` buffer and accumulates the Morse code patterns in the `current-pattern` buffer. It identifies dots, dashes, and gaps based on the binary values and emits the corresponding Morse code characters when a gap is encountered. This step effectively recognizes the Morse code patterns and prepares for the subsequent decoding step to convert the accumulated patterns into readable characters.
+
+## 9. `decode`: 
+This word converts the accumulated Morse code patterns into readable characters. It maps each Morse code pattern to its corresponding ASCII character by adding `8` to the pattern value and emits the characters.
+
+Let's explain the `decode` word in the program:
+
+```
+: decode ( -- )
+  decoded-message 0 DO
+    decoded-message I @ C@ 8 + EMIT
+  LOOP
+;
+```
+
+- `: decode ( -- )` declares the `decode` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- `decoded-message 0 DO` starts a loop that iterates from `0` to the length of the `decoded-message` buffer minus `1`.
+
+- `decoded-message I @` retrieves the address of the `decoded-message` buffer at the loop index `I`.
+
+- `C@` fetches the character stored in memory at the address fetched in the previous step.
+
+- `8 +` adds `8` to the fetched character. This is done because Morse code characters are typically represented as values from `0` to `31`, and adding `8` maps them to the corresponding ASCII characters.
+
+- `EMIT` outputs the resulting ASCII character to the output.
+
+- `LOOP` marks the end of the loop. The loop continues until the loop index `I` reaches the maximum value (length of `decoded-message` minus `1`).
+
+In summary, the `decode` word retrieves each Morse code pattern stored in the `decoded-message` buffer, converts it to its corresponding ASCII character, and emits it to the output. This process effectively decodes the Morse code into readable text. By executing the `decode` word, you will be able to see the decoded message from the Morse code patterns stored in the `decoded-message` buffer.
+
+
+## 10. `morse-code-signal`: 
+This word serves as the main entry point of the program. It executes all the preprocessing and decoding steps in sequence.
+By executing the `morse-code-signal` word, the audio signal is preprocessed, the Morse code patterns are recognized, and the decoded message is emitted. The final output is the decoded message, which represents the Morse code signals in readable text.
+
+Certainly! Let's explain the `morse-code-signal` word in the program:
+
+```
+: morse-code-signal ( -- )
+  preprocess
+  pre-emphasis
+  noise-reduction
+  bandpass-filter
+  normalize
+  threshold
+  duration-analysis
+  pattern-recognition
+  decode
+;
+
+morse-code-signal
+```
+
+- `: morse-code-signal ( -- )` declares the `morse-code-signal` word in Forth, indicating that it takes no inputs and leaves no outputs on the stack.
+
+- The `morse-code-signal` word serves as the main entry point of the program.
+
+- `preprocess` invokes the `preprocess` word, which performs the initial processing steps such as dividing the audio signal into frames, applying pre-emphasis filtering, and storing the frames in the `frames` buffer.
+
+- `pre-emphasis` invokes the `pre-emphasis` word, which applies a pre-emphasis filter to each frame in the `frames` buffer.
+
+- `noise-reduction` invokes the `noise-reduction` word, which applies a noise reduction algorithm to each frame in the `frames` buffer.
+
+- `bandpass-filter` invokes the `bandpass-filter` word, which applies a bandpass filter to each frame in the `frames` buffer.
+
+- `normalize` invokes the `normalize` word, which normalizes the amplitude of the processed signal in the `frames` buffer.
+
+- `threshold` invokes the `threshold` word, which converts the normalized signal into a binary representation by applying a threshold.
+
+- `duration-analysis` invokes the `duration-analysis` word, which analyzes the durations of ON and OFF periods in the binary signal and stores them in the `patterns` buffer.
+
+- `pattern-recognition` invokes the `pattern-recognition` word, which recognizes the Morse code patterns based on the durations stored in the `patterns` buffer and emits the corresponding Morse code characters.
+
+- `decode` invokes the `decode` word, which converts the accumulated Morse code patterns into readable characters by mapping them to their corresponding ASCII characters.
+
+- Finally, `morse-code-signal` is executed, triggering the sequential execution of all the preprocessing and decoding steps.
+By executing the `morse-code-signal` word, the audio signal is preprocessed, the Morse code patterns are recognized, and the decoded message is emitted. The final output is the decoded message, which represents the Morse code signals in readable text.
+ 
+
+Remember to adjust the parameters and replace the file name with your actual Morse code audio signal file. Additionally, you may need to adapt the code to your specific Forth environment and define the required variables and constants.`: This word reads the audio signal and prepares it for further processing. It divides the signal into frames, applies pre-emphasis filtering to enhance higher frequencies, and stores the processed frames in the `frames` buffer.
+
+ 
+
+ 
+
+## Forth code refactors some of the previous errors and adds improvements:
 
 The CREATE command is used to allocate memory for the frames array.
 The frames-addr variable is introduced to hold the base address of the frames array.
@@ -308,7 +673,8 @@ After loading the code into your Forth system, executing morse-code-signal will 
 
 
 
-## Technical Goal: Development of a Morse Code Transmitter and Receiver System with Error Tolerance and Keypad Input
+## Technical Goal: 
+Development of a Morse Code Transmitter and Receiver System with Error Tolerance and Keypad Input
 
 Objective: To design and implement a comprehensive Morse Code communication system capable of encoding and decoding messages while being tolerant against frequency drift, duration shift, and errors. The system should provide a user-friendly interface for inputting Morse Code messages via a keypad and outputting them through a TTL switch to operate a Pixie QRP-CW-2Watt transmitter connected to a magloop antenna. The system will also include an LED readout to display the transmitted and received Morse Code messages.
 
