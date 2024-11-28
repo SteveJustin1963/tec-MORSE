@@ -4,7 +4,7 @@ Morse code sender that takes keyboard input and outputs to a port bit.
 Includes timing and proper Morse spacing.
 
 ```
-// Morse Code Sender for MINT2
+/// Full Alphanumeric Morse Code Sender for MINT2
 // Variables:
 // p = output port number (#80) 
 // b = output bit mask (#01)
@@ -20,8 +20,11 @@ Includes timing and proper Morse spacing.
 
 // Morse patterns lookup - each pattern ends with 0
 // Format: dot=1 dash=2 end=0
-:S [102 2110 2110 2110 10 1110 220 1110 1111 1222 212 1210 22 // A-M
-    21 222 1210 2212 121 111 2 112 112 122 2212 2122 2211 0] s! ; // N-Z
+:S [ // A-Z patterns
+    102 2110 2110 2110 10 1110 220 1110 1111 1222 212 1210 22  // A-M
+    21 222 1210 2212 121 111 2 112 112 122 2212 2122 2211 0    // N-Z
+    // 0-9 patterns
+    22222 12222 11222 11122 11112 11111 21111 22111 22211 22221 0 ] s! ; 
 
 // Send bit to port - accepts 0 or 1
 :B b * p /O ; // Output to port using mask
@@ -35,8 +38,20 @@ Includes timing and proper Morse spacing.
 // Send dash
 :H 1 B 3 D 0 B 1 D ;
 
-// Find pattern for letter (returns index to s array)
-:F c #41 - // Convert ASCII to 0-based index
+// Convert ASCII to pattern index
+:V c! // Save character
+   c #30 >= c #39 <= & ( // If number 0-9
+     c #30 - 26 + // Convert to index after letters
+   ) /E (
+     c #41 >= c #5A <= & ( // If letter A-Z
+       c #41 - // Convert to index 0-25
+     ) /E (
+       0 // Invalid character
+     )
+   ) ;
+
+// Find pattern for character (returns index to s array)
+:F V // Get character index
    13 * // Multiply by max pattern length
    s + ; // Add to string base address
 
@@ -52,62 +67,204 @@ Includes timing and proper Morse spacing.
 
 // Main input/output loop
 :M /U (
-     `Enter text (uppercase):` /N
+     `Enter text (uppercase A-Z, 0-9):` /N
      /K c! // Get character
      c #0D = /W // Exit on CR
-     c #20 = ( 7 D ) /E ( c C ) // Space or character
+     c #20 = ( 7 D ) /E ( // Space or character
+       c #30 >= c #39 <= & ( c C ) /E ( // If number
+         c #41 >= c #5A <= & ( c C ) /E ( // If letter
+           `Invalid char` /N // Otherwise invalid
+         )
+       )
+     )
    ) ;
 
 // Initialize and run
 :R I S M ;
 ```
 
+# MINT2 Morse Code Sender Manual
 
-This Morse code sender has several key features:
+## Overview
+The MINT2 Morse Code Sender is a program that converts keyboard input into Morse code signals output through a single bit on a specified port. It supports all alphanumeric characters (A-Z, 0-9) and implements standard International Morse Code timing.
 
-1. Port Configuration:
-- Uses port #80 (configurable)
-- Single bit output using bit mask
-- Adjustable timing for different WPM speeds
+## Technical Specifications
 
-2. Morse Pattern Storage:
-- Efficient pattern encoding (1=dot, 2=dash, 0=end)
-- Supports A-Z uppercase letters
-- Patterns stored in compact array
+### Hardware Requirements
+- Port access (default: port #80)
+- Single bit output capability (default: bit 0)
+- Keyboard input
+- MINT2 interpreter system
 
-3. Timing:
-- Base timing unit is configurable
-- Standard Morse timings:
-  - Dot = 1 unit
-  - Dash = 3 units
-  - Inter-element space = 1 unit
-  - Inter-character space = 3 units
-  - Word space = 7 units
+### Timing Standards
+All timings are derived from a base unit (t) which can be adjusted for different WPM:
+- Dot = 1 unit
+- Dash = 3 units
+- Inter-element space = 1 unit
+- Inter-character space = 3 units
+- Word space = 7 units
 
-4. Functions:
-- I: Initialize port and timing
-- B: Output bit to port
-- D: Time delay
-- T: Send dot
-- H: Send dash
-- F: Find pattern for letter
-- C: Send one character
-- M: Main input loop
-- R: Run program
+### Variable Usage
+- p: Output port number (#80)
+- b: Output bit mask (#01)
+- t: Base time unit (ms)
+- c: Current character
+- i: Lookup index
+- s: Morse string buffer
 
-To use:
-1. Run :R to start
-2. Type uppercase letters (A-Z)
-3. Use space for word separation
-4. Enter/return to exit
+## Morse Code Patterns
 
-The program will output proper Morse code timing to the specified port bit. You can adjust:
-- Port number in I function (p!)
-- Bit mask in I function (b!)
-- Base timing unit in I function (t!)
-- Port timing in D function multiplier
+### Letters (A-Z)
+```
+A: .-      B: -...    C: -.-.    D: -..     E: .
+F: ..-.    G: --.     H: ....    I: ..      J: .---
+K: -.-     L: .-..    M: --      N: -.      O: ---
+P: .--.    Q: --.-    R: .-.     S: ...     T: -
+U: ..-     V: ...-    W: .--     X: -..-    Y: -.--
+Z: --..
+```
 
+### Numbers (0-9)
+```
+0: -----   1: .----   2: ..---   3: ...--   4: ....-
+5: .....   6: -....   7: --...   8: ---..   9: ----.
+```
 
+## Program Functions
+
+### Setup Functions
+```mint
+:I  // Initialize ports and timing
+:S  // Set up Morse patterns lookup table
+```
+
+### Core Operation Functions
+```mint
+:B  // Send bit to port (0 or 1)
+:D  // Time delay
+:T  // Send dot
+:H  // Send dash
+:V  // Convert ASCII to pattern index
+:F  // Find pattern for character
+:C  // Send one Morse character
+:M  // Main input/output loop
+:R  // Initialize and run program
+```
+
+## Using the Program
+
+### Starting the Program
+1. Load the program into MINT2
+2. Type `:R` to start
+3. Program will prompt for input
+
+### Input Rules
+- Use UPPERCASE letters only (A-Z)
+- Numbers 0-9 are supported
+- Use SPACE for word separation
+- Press ENTER/RETURN to exit
+
+### Example Usage
+```
+Enter text (uppercase A-Z, 0-9):
+SOS
+[Output: ... --- ...]
+
+HELLO 123
+[Output: .... . .-.. .-.. --- .---- ..--- ...--]
+```
+
+## Implementation Details
+
+### Pattern Storage
+The program stores Morse patterns in a compact format:
+- 1 = dot
+- 2 = dash
+- 0 = end of character
+- Patterns stored in s array
+
+### Timing Implementation
+```mint
+// Base delay unit (adjustable)
+256 t! 
+
+// Delay function
+:D t * 50 * (0) ;
+```
+
+### Port Output
+```mint
+// Configure port and bit
+#80 p!  // Set port
+#01 b!  // Set bit mask
+
+// Output function
+:B b * p /O ;
+```
+
+## Error Handling
+- Invalid characters display error message
+- Program continues operation
+- Invalid inputs are ignored
+- Proper spacing maintained
+
+## Adjusting the Program
+
+### Speed Adjustment
+Modify the base timing unit in the :I function:
+```mint
+256 t!  // Increase for slower, decrease for faster
+```
+
+### Port Configuration
+Change port number and bit mask in :I function:
+```mint
+#80 p!  // Change port number
+#01 b!  // Change bit mask
+```
+
+### Delay Tuning
+Adjust multiplier in :D function:
+```mint
+:D t * 50 * (0) ;  // Change 50 to adjust timing
+```
+
+## Limitations
+- Uppercase letters only
+- No punctuation marks
+- Fixed WPM (requires restart to change speed)
+- Single output bit only
+- No simultaneous input handling
+
+## Technical Notes
+- Uses MINT2's integer-only operations
+- Implements fixed timing ratios
+- Efficient pattern storage
+- Minimal memory usage
+- Real-time operation capable
+
+## Troubleshooting
+1. No Output
+   - Check port number configuration
+   - Verify bit mask setting
+   - Ensure hardware connection
+
+2. Wrong Timing
+   - Adjust base timing unit
+   - Check delay multiplier
+   - Verify system timing constraints
+
+3. Invalid Characters
+   - Use uppercase letters only
+   - Verify input is A-Z or 0-9
+   - Check for proper spacing
+
+## Future Improvements
+- Add support for punctuation
+- Implement variable speed control
+- Add input buffering
+- Include two-way communication
+- Add sound output option
 
 
 
